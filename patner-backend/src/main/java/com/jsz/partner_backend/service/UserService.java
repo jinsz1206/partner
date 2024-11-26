@@ -4,6 +4,7 @@ import com.jsz.partner_backend.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
 * @author ex_shengzhou.jin
@@ -41,4 +42,6 @@ public interface UserService extends IService<User> {
 
     int userLogout(HttpServletRequest request);
 
+
+    List<User> searchUsersByTags(List<String> tagList);
 }

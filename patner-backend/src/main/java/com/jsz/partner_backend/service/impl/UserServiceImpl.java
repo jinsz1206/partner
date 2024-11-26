@@ -1,5 +1,6 @@
 package com.jsz.partner_backend.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.jsz.partner_backend.contant.UserConstant.USER_LOGIN_STATE;
 
@@ -163,6 +167,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public int userLogout(HttpServletRequest request) {
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return  1;
+    }
+
+
+    /**
+     * 标签查询用户
+     *
+     * @param tagList
+     * @return
+     */
+    @Override
+    public List<User> searchUsersByTags(List<String> tagList){
+        if (CollectionUtil.isEmpty(tagList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        //拼接查询 like ''
+        for (String tag : tagList) {
+            queryWrapper = queryWrapper.like("tags",tag);
+        }
+        List<User> users = userMapper.selectList(queryWrapper);
+        return users.stream().map(this::getSafeUser).collect(Collectors.toList());
+
     }
 
 }
