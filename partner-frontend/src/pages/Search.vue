@@ -1,84 +1,91 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-import { showToast } from 'vant';
-
-// 占位
-const value = ref(' ');
-
-const onSearch = (val) => showToast(val);
-const onCancel = () => showToast('取消');
-
-
-//标签列表
-const tagList = [
-  {
-    text: '浙江',
-    children: [
-      { text: '杭州', id: 1 },
-      { text: '温州', id: 2 },
-      { text: '宁波', id: 3, disabled: true },
-    ],
-  },
-  {
-    text: '江苏',
-    children: [
-      { text: '南京', id: 4 },
-      { text: '无锡', id: 5 },
-      { text: '徐州', id: 6 },
-    ],
-  },
-  { text: '福建', disabled: true },
-];
-
-//已选择的标签
-const activeIds = ref([]);
-const activeIndex = ref(0);
-
-//关闭标签
-const  doClose = (tag) =>{
-  activeIds.value = activeIds.value.filter(item =>{
-    return item !== tag;
-  })
-
-}
-
-
-</script>
-
 <template>
   <form action="/">
     <van-search
-        v-model="value"
+        v-model="searchText"
         show-action
         placeholder="请输入搜索标签"
         @search="onSearch"
         @cancel="onCancel"
     />
   </form>
+  <van-divider content-position="left">已选标签</van-divider>
+  <div v-if="activeIds.length === 0">请选择标签</div>
+  <van-row gutter="16" style="padding: 0 16px">
+    <van-col v-for="tag in activeIds">
+      <van-tag  closeable size="small" type="primary" @close="doclose(tag)">
+        {{ tag }}
+      </van-tag>
+    </van-col>
+  </van-row>
 
-  <van-divider dashed>已选</van-divider>
-  <div v-if="tagList.length === 0">....</div>
-  <van-tag v-for="tag in activeIds" :show="true" closeable size="large" type="primary" @close="doClose(tag)">
-    {{ tag }}
-  </van-tag>
-
-
-
-
-  <van-divider dashed>文本</van-divider>
+  <van-divider content-position="left">已选标签</van-divider>
   <van-tree-select
       v-model:active-id="activeIds"
       v-model:main-active-index="activeIndex"
       :items="tagList"
   />
-
-
-
-
 </template>
 
+<script setup>
+import { ref } from 'vue';
+
+const searchText = ref('');
+
+const originTagList = [{
+  text: '性别',
+  children: [
+    { text: '男', id: '男' },
+    { text: '女', id: '女' },
+    { text: '嬲', id: '嬲' },
+  ],
+}, {
+  text: '年级',
+  children: [
+    { text: '大一', id: '大一' },
+    { text: '大二', id: '大二' },
+    { text: '大三', id: '大三' },
+    { text: '大四', id: '大四' },
+    { text: '大五', id: '大五' },
+    { text: '大六', id: '大六' },
+  ],
+},
+];
+//标签列表
+let tagList = ref(originTagList);
+/**
+ *  搜索过滤
+ * @param val
+ */
+const onSearch = (val) => {
+  tagList.value = originTagList.map(parentTag =>{
+    const tempChildren =  [...parentTag.children];
+    const tempParentTag =  {...parentTag};
+    tempParentTag.children = tempChildren.filter(item => item.text.includes(searchText.value))
+    return tempParentTag;
+  })
+};
+
+//取消  清空
+const onCancel = () => {
+  searchText.value = '';
+  tagList.value = originTagList;
+};
 
 
+//已选中的标签
+const activeIds = ref([]);
+const activeIndex = ref(0);
+
+
+//关闭标签
+const  doclose = (tag) =>{
+  activeIds.value = activeIds.value.filter(item =>{
+    return item !== tag;
+  })
+
+}
+
+</script>
 
 <style scoped>
 
