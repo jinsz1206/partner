@@ -6,6 +6,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jsz.partner_backend.common.ErrorCode;
 import com.jsz.partner_backend.exception.BusinessException;
 import com.jsz.partner_backend.model.domain.User;
@@ -13,11 +15,12 @@ import com.jsz.partner_backend.service.UserService;
 import com.jsz.partner_backend.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.jsz.partner_backend.contant.UserConstant.USER_LOGIN_STATE;
@@ -160,6 +163,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setCreateTime(user.getCreateTime());
         safetyUser.setUpdateTime(user.getUpdateTime());
         safetyUser.setUserGender(user.getUserGender());
+        safetyUser.setTags(user.getTags());
         return safetyUser;
     }
 
@@ -171,7 +175,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 
     /**
-     * 标签查询用户
+     * 标签查询用户 by 内存
      *
      * @param tagList
      * @return
@@ -181,6 +185,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (CollectionUtil.isEmpty(tagList)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        //内存查询
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        //查询所有用户
+        List<User> userList = userMapper.selectList(queryWrapper);
+        Gson gson = new Gson();
+        //内存中判断
+        return userList.stream().filter(user -> {
+            String tags = user.getTags();
+//            if (StrUtil.isBlank(tags)) {
+//                return false;
+//            }
+            Set<String> tagNameSet = gson.fromJson(tags, new TypeToken<Set<String>>(){}.getType());
+            // java 8  Optional 判断
+            tagNameSet = Optional.ofNullable(tagNameSet).orElse(new HashSet<>());
+
+
+            for (String tagName : tagList) {
+                if(!tagNameSet.contains(tagName)){
+                    return false;
+                }
+            }
+            return true;
+        }).map(this::getSafeUser).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> searchUsersByTagsBySQL(List<String> tagList) {
+
+        if (CollectionUtil.isEmpty(tagList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //数据库查询
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         //拼接查询 like ''
         for (String tag : tagList) {
@@ -188,8 +224,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         List<User> users = userMapper.selectList(queryWrapper);
         return users.stream().map(this::getSafeUser).collect(Collectors.toList());
-
     }
+
 
 }
 

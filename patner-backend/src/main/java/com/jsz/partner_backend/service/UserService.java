@@ -40,8 +40,20 @@ public interface UserService extends IService<User> {
      */
     User getSafeUser(User user);
 
+
+    /**
+     * 用户登出
+     * @param request
+     * @return
+     */
     int userLogout(HttpServletRequest request);
 
-
+    /**
+     * 标签查询用户
+     * @param tagList
+     * @return
+     */
     List<User> searchUsersByTags(List<String> tagList);
+    List<User> searchUsersByTagsBySQL(List<String> tagList);
+
 }

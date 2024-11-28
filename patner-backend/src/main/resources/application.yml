@@ -1,13 +1,12 @@
 spring:
 
-    # dataSource config
+
+  # dataSource config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-   #todo 换数据库重新设计表
     url: jdbc:mysql://localhost:3306/jinsz
     username: root
-    # 家里笔记本是 328245  公式的是123456
-    password: 123456
+    password: 328245
   session:
     timeout: 86400
 server:
@@ -18,6 +17,9 @@ server:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
+    #mybatis-plus配置控制台打印完整带参数SQL语句
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 
   global-config:
     db-config:
