@@ -1,14 +1,17 @@
 spring:
-
-
   # dataSource config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/jinsz
     username: root
     password: 328245
+
   session:
     timeout: 86400
+
+  profiles:
+    active: dev
+
 server:
   port: 8080
   servlet:
@@ -32,9 +35,14 @@ knife4j:
   enable: true
   openapi:
     title: "接口文档"
+    description: "测试？？"
+    email: 1209990432@qq.com
+    concat: 八一菜刀
     version: 1.0
     group:
       default:
+        group-name: jsz
         api-rule: package
         api-rule-resources:
           - com.jsz.partner_backend.controller
+

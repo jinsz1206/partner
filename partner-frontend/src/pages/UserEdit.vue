@@ -22,9 +22,9 @@ const onSubmit = (values:string) => {
   <van-form @submit="onSubmit">
     <van-cell-group inset>
       <van-field
-          v-model="editUser.currentValue"
-          :name="editUser.editKey"
-          :label="editUser.editName"
+          v-model:string="editUser.currentValue"
+          :name:string="editUser.editKey"
+          :label:string="editUser.editName"
           :placeholder="`请输入${editUser.editName}`"
       />
     </van-cell-group>

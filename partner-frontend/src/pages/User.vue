@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 
+
 const user = {
   id: 1,
   userName: 'jsz',

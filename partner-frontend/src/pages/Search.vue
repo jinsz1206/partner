@@ -12,7 +12,7 @@
   <div v-if="activeIds.length === 0">请选择标签</div>
   <van-row gutter="16" style="padding: 0 16px">
     <van-col v-for="tag in activeIds">
-      <van-tag  closeable size="small" type="primary" @close="doclose(tag)">
+      <van-tag  closeable size="medium" type="primary" @close="doclose(tag)">
         {{ tag }}
       </van-tag>
     </van-col>
@@ -24,12 +24,35 @@
       v-model:main-active-index="activeIndex"
       :items="tagList"
   />
+
+  <div style="padding:16px">
+    <van-button block type="primary" @click="doSearch">搜索</van-button>
+  </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+
+
+
+<script setup lang="ts">
+import {ref} from 'vue';
+
+import {useRouter} from "vue-router";
+
 
 const searchText = ref('');
+const router = useRouter()
+
+
+
+
+const doSearch = () => {
+  router.push({
+    path: 'user/list',
+    query: {
+      tags: activeIds.value
+    }
+  })
+}
 
 const originTagList = [{
   text: '性别',
@@ -42,9 +65,9 @@ const originTagList = [{
   text: '年级',
   children: [
     { text: '大一', id: '大一' },
-    { text: '大二', id: '大二' },
-    { text: '大三', id: '大三' },
-    { text: '大四', id: '大四' },
+    { text: 'kafka', id: 'kafka' },
+    { text: 'python', id: 'python' },
+    { text: 'java', id: 'java' },
     { text: '大五', id: '大五' },
     { text: '大六', id: '大六' },
   ],
@@ -56,7 +79,7 @@ let tagList = ref(originTagList);
  *  搜索过滤
  * @param val
  */
-const onSearch = (val) => {
+const onSearch = () => {
   tagList.value = originTagList.map(parentTag =>{
     const tempChildren =  [...parentTag.children];
     const tempParentTag =  {...parentTag};
@@ -84,6 +107,9 @@ const  doclose = (tag) =>{
   })
 
 }
+
+
+
 
 </script>
 

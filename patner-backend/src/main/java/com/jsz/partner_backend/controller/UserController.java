@@ -1,6 +1,7 @@
 package com.jsz.partner_backend.controller;
 
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jsz.partner_backend.common.BaseResponse;
@@ -118,6 +119,15 @@ public class UserController {
         List<User> userList = userService.list(userQueryWrapper);
         List<User> list = userList.stream().map(user -> userService.getSafeUser(user)).collect(Collectors.toList());
         return ResultUtils.success(list);
+    }
+
+    @GetMapping("/search/tags")
+    public BaseResponse<List<User>> searchUserTags(@RequestParam(required = false)List<String> tagNameList) {
+        if (CollectionUtil.isEmpty(tagNameList)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        List<User> userList = userService.searchUsersByTags(tagNameList);
+        return ResultUtils.success(userList);
     }
 
     @PostMapping("/delete")

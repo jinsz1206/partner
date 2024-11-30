@@ -4,11 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 4396 --host",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.7.8",
+    "qs": "^6.13.1",
     "vant": "^4.9.9",
     "vue": "^3.5.12",
     "vue-router": "^4.5.0"

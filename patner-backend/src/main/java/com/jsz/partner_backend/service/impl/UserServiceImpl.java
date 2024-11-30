@@ -199,8 +199,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             Set<String> tagNameSet = gson.fromJson(tags, new TypeToken<Set<String>>(){}.getType());
             // java 8  Optional 判断
             tagNameSet = Optional.ofNullable(tagNameSet).orElse(new HashSet<>());
-
-
             for (String tagName : tagList) {
                 if(!tagNameSet.contains(tagName)){
                     return false;
