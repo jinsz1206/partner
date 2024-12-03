@@ -1,4 +1,8 @@
 -- auto-generated definition
+create database if not exists jin;
+
+use jin;
+
 create table user
 (
     id           bigint auto_increment comment 'id'

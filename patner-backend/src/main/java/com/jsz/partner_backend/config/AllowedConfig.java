@@ -15,7 +15,7 @@ public class AllowedConfig implements WebMvcConfigurer {
 
                 //允许跨域请求的域名
                 //前端域名
-                .allowedOrigins("http://localhost:4396","http://192.168.101.3:4396")
+                .allowedOrigins("http://localhost:4396/","http://192.168.101.3:4396/")
                 .allowCredentials(true)
                 .allowedMethods("*")
                 .maxAge(3600);

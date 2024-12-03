@@ -3,7 +3,11 @@
 import axios from "axios";
 
 const myAxios = axios.create({
-    baseURL: 'http://localhost:8080/api'
+    baseURL: '/api',
+    proxy: {
+        host: '192.168.101.3',
+        port: 4396
+    }
 });
 
 //拦截器

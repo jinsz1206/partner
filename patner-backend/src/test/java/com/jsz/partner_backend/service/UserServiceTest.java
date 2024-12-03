@@ -92,6 +92,23 @@ class UserServiceTest {
     }
 
 
+    @Test
+    public void testAddUser123() {
+        User user = new User();
+        user.setUserAccount("1209990432");
+        user.setUserPassword("jsz20031216");
+
+        user.setUserGender("男");
+        user.setUserName("呃呃呃");
+        user.setUserProfile("神人");
+        user.setUserRole("user");
+        boolean reasult = userService.save(user);
+        System.out.println(user.getId());
+        Assertions.assertTrue(reasult);
+
+    }
+
+
 
 
 
