@@ -5,7 +5,7 @@ import axios from "axios";
 const myAxios = axios.create({
     baseURL: '/api',
     proxy: {
-        host: '192.168.101.3',
+        host: 'localhost',
         port: 4396
     }
 });
@@ -25,7 +25,7 @@ myAxios.interceptors.request.use(function (config) {
 myAxios.interceptors.response.use(function (response) {
     // 对响应数据做点什么
     console.log("请求收到了了",response)
-    return response;
+    return response.data;
 }, function (error) {
     // 对响应错误做点什么
     return Promise.reject(error);

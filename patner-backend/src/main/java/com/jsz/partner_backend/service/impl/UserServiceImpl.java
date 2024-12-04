@@ -224,6 +224,50 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return users.stream().map(this::getSafeUser).collect(Collectors.toList());
     }
 
+    @Override
+    public Integer updateUser(User user,User loginUser) {
+        long userId = user.getId();
+        if(userId <= 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //管理员可以修改任意用户信息
+        //用户修改本人信息
+        if(!isAdmin(loginUser) && userId != loginUser.getId()){
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        User olduser = userMapper.selectById(userId);
+        if(olduser == null){
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+        return userMapper.updateById(user);
+    }
+
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        if (request == null){
+            return null;
+        }
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (userObj == null){
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+
+        return (User) userObj;
+    }
+
+    @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) userObj;
+
+        return user != null && user.getUserRole().equals("admin");
+    }
+
+    @Override
+    public boolean isAdmin(User loginUser) {
+        return loginUser != null && loginUser.getUserRole().equals("admin");
+    }
+
 
 }
 

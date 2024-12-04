@@ -88,27 +88,14 @@ public class UserController {
 
     //管理用户接口
 
-    /**
-     *  是否管理员
-     * @param request
-     * @return
-     */
-    private boolean isAdmin(HttpServletRequest request) {
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) userObj;
-        if (user == null){
-            return false;
-        }
-        if (user.getUserRole().equals("admin")){
-            return true;
-        }
-        return false;
-    }
+
+
+
 
 
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUser(String username,HttpServletRequest request) {
-        if (!isAdmin(request)){
+        if (!userService.isAdmin(request)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
@@ -132,7 +119,7 @@ public class UserController {
 
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id,HttpServletRequest request) {
-        if (!isAdmin(request)){
+        if (!userService.isAdmin(request)){
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
 
@@ -143,6 +130,15 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
+    @PostMapping("/update")
+    public BaseResponse<Integer> updateUser(@RequestBody User user,HttpServletRequest request) {
+        if (user == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        int result = userService.updateUser(user,loginUser);
+        return ResultUtils.success(result);
+    }
 
 
 

@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+import static com.jsz.partner_backend.contant.UserConstant.USER_LOGIN_STATE;
+
 /**
 * @author ex_shengzhou.jin
 * @description 针对表【user】的数据库操作Service
@@ -55,5 +57,36 @@ public interface UserService extends IService<User> {
      */
     List<User> searchUsersByTags(List<String> tagList);
     List<User> searchUsersByTagsBySQL(List<String> tagList);
+
+
+    /**
+     *
+     * @param user
+     * @param loginUser
+     * @return
+     */
+    Integer updateUser(User user,User loginUser);
+
+    /**
+     * 获取当前登录用户
+     * @param request
+     * @return
+     */
+    User getLoginUser(HttpServletRequest request);
+
+    /**
+     *  是否管理员
+     * @param request
+     * @return
+     */
+    boolean isAdmin(HttpServletRequest request);
+
+
+    /**
+     *  是否管理员
+     * @param loginUser
+     * @return
+     */
+    boolean isAdmin(User loginUser);
 
 }

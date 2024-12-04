@@ -16,10 +16,10 @@ import lombok.Data;
 @Data
 public class User implements Serializable {
     /**
-     * id
+     * id  不能为null 不要用包装类
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private long id;
 
     /**
      * 账号
