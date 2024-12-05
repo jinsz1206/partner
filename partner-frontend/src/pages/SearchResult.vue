@@ -6,7 +6,7 @@
       :thumb="user.avatarUrl"
   >
     <template #tags>
-      <van-tag plain type="danger" v-for="tag in tags" style="margin-right: 8px; margin-top: 8px" >
+      <van-tag plain type="danger" v-for="tag in user.tags" style="margin-right: 8px; margin-top: 8px" >
         {{tag}}
       </van-tag>
     </template>
@@ -20,12 +20,13 @@
 import {onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 
-import myAxios from "../plugins/myAxios.js";
+import myAxios from "../plugins/myAxios.ts";
 
 import qs from 'qs'
 
 const route = useRoute();
 const {tags} = route.query;
+
 
 const mockUser = ref({
   id: 931,
@@ -41,12 +42,12 @@ const mockUser = ref({
   createTime: new Date(),
 })
 
-const userList = ref({mockUser});
+const userList = ref();
 
 
 onMounted( async () =>{
   // 为给定 ID 的 user 创建请求
-  const userListData = await  myAxios.get('/user/search/tags',{
+  const userListData = await myAxios.get('/user/search/tags',{
     withCredentials: false,
     params: {
       tagNameList: tags
@@ -60,7 +61,7 @@ onMounted( async () =>{
       .then(function (response) {
         console.log('/user/search/tags succeed',response);
         showToast('请求成功');
-        return response.data?.data;
+        return response?.data;
       })
       .catch(function (error) {
         console.log('/user/search/tags error',error);

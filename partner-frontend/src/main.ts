@@ -1,6 +1,6 @@
 import {createApp} from 'vue'
 import App from './App.vue'
-import {Button, Card, Icon, NavBar, Search, showToast, Tabbar, TabbarItem, Tag} from "vant";
+import {Button, Card, CellGroup, Field, Icon, NavBar, Search, showToast, Tabbar, TabbarItem, Tag} from "vant";
 import * as VueRouter from 'vue-router'
 import routes from "./config/route.ts";
 
@@ -15,6 +15,8 @@ app.use(showToast);
 app.use(Search);
 app.use(Tag);
 app.use(Card);
+app.use(Field);
+app.use(CellGroup);
 
 const router = VueRouter.createRouter({
     history : VueRouter.createWebHashHistory(),

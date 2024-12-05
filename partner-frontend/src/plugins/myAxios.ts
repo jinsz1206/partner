@@ -2,6 +2,8 @@
 //自定义实例默认值
 import axios from "axios";
 
+
+
 const myAxios = axios.create({
     baseURL: '/api',
     proxy: {
@@ -9,6 +11,12 @@ const myAxios = axios.create({
         port: 4396
     }
 });
+
+
+//不知道要不要
+// myAxios.defaults.withCredentials = true;
+
+
 
 //拦截器
 // 添加请求拦截器
