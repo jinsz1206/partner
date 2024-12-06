@@ -86,12 +86,17 @@ public class UserController {
     }
 
 
+
+    @GetMapping("/recommend")
+    public BaseResponse<List<User>> recommendUsers(HttpServletRequest request) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        List<User> userList = userService.list(userQueryWrapper);
+        List<User> list = userList.stream().map(user -> userService.getSafeUser(user)).collect(Collectors.toList());
+        return ResultUtils.success(list);
+    }
+
+
     //管理用户接口
-
-
-
-
-
 
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUser(String username,HttpServletRequest request) {
