@@ -71,7 +71,6 @@ public class UserController {
         User user = userService.getById(userId);
         User safetyuser  = userService.getSafeUser(user);
         return ResultUtils.success(safetyuser);
-
     }
 
 
@@ -80,7 +79,6 @@ public class UserController {
         if (request == null){
             throw  new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-
         int result =  userService.userLogout(request);
         return ResultUtils.success(result);
     }
