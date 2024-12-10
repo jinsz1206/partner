@@ -1,10 +1,15 @@
 package com.jsz.partner_backend.common;
 
+import lombok.Getter;
+
 /**
  * @Title: ErrorCode
  * @Author jsz
  * @Package com.jsz.usercenter.common
  */
+
+
+@Getter
 public enum ErrorCode {
 
     SUCCESS(0,"success",""),
@@ -24,15 +29,5 @@ public enum ErrorCode {
         this.msg = msg;
         this.description = description;
     }
-    public int getCode() {
-        return code;
-    }
 
-    public String getMsg() {
-        return msg;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }

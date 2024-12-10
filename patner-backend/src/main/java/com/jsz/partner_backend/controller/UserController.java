@@ -4,6 +4,7 @@ package com.jsz.partner_backend.controller;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jsz.partner_backend.common.BaseResponse;
 import com.jsz.partner_backend.common.ErrorCode;
 import com.jsz.partner_backend.exception.BusinessException;
@@ -12,20 +13,28 @@ import com.jsz.partner_backend.model.request.UserLoginRequest;
 import com.jsz.partner_backend.model.request.UserRegisterRequest;
 import com.jsz.partner_backend.service.UserService;
 import com.jsz.partner_backend.utils.ResultUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.jsz.partner_backend.contant.UserConstant.USER_LOGIN_STATE;
 
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private RedisTemplate<String,Object> redisTemplate;
 
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
@@ -86,11 +95,29 @@ public class UserController {
 
 
     @GetMapping("/recommend")
-    public BaseResponse<List<User>> recommendUsers(HttpServletRequest request) {
+    public BaseResponse<Page<User>> recommendUsers(long pageSize,long pageNum,HttpServletRequest request) {
+
+        User loginUser = userService.getLoginUser(request);
+        String redisKey = String.format("partner:user:recommend:%s",loginUser.getId());
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+
+        //如果有缓存，直接读取缓存
+        Page<User> userPage = (Page<User>) valueOperations.get(redisKey);
+        if (userPage != null){
+            return ResultUtils.success(userPage);
+        }
+
+        //如果无缓存，数据库查询
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        List<User> userList = userService.list(userQueryWrapper);
-        List<User> list = userList.stream().map(user -> userService.getSafeUser(user)).collect(Collectors.toList());
-        return ResultUtils.success(list);
+        userPage = userService.page(new Page<>(pageNum, pageSize), userQueryWrapper);
+        //加缓存
+        try {
+            valueOperations.set(redisKey,userPage,100, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error("redis set key error",e);
+        }
+
+        return ResultUtils.success(userPage);
     }
 
 
@@ -116,7 +143,7 @@ public class UserController {
         if (CollectionUtil.isEmpty(tagNameList)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        List<User> userList = userService.searchUsersByTags(tagNameList);
+        List<User> userList = userService.searchUsersByTagsBySQL(tagNameList);
         return ResultUtils.success(userList);
     }
 

@@ -3,9 +3,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/jinsz
+    url: jdbc:mysql://localhost:3306/jin
     username: root
-    password: 328245
+    password: 123456
   session:
     timeout: 86400
     store-type: redis
@@ -41,9 +41,8 @@ knife4j:
   enable: true
   openapi:
     title: "接口文档"
-    description: "测试？？"
     email: 1209990432@qq.com
-    concat: 八一菜刀
+    concat: jjj
     version: 1.0
     group:
       default:

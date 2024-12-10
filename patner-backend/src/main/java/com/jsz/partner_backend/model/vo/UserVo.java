@@ -1,35 +1,25 @@
-package com.jsz.partner_backend.model.domain;
+package com.jsz.partner_backend.model.vo;
 
-import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
-import java.util.Date;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 
-//todo 下载mybatisX 自动生成
+import java.util.Date;
 
-/**
- * 
- * @TableName user
- */
-@TableName(value ="user")
+
 @Data
-public class User implements Serializable {
+public class UserVo {
+
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
      * 账号
      */
     private String userAccount;
-
-    /**
-     * 密码
-     */
-    private String userPassword;
 
     /**
      * 微信开放平台id
@@ -86,7 +76,4 @@ public class User implements Serializable {
      */
     @TableLogic
     private Integer isDelete;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 158347652422567L;
 }

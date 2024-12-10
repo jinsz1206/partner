@@ -22,12 +22,15 @@ const userList = ref();
 onMounted( async () =>{
   // 为给定 ID 的 user 创建请求
   const userListData = await myAxios.get('/user/recommend',{
-    params: {},
+    params: {
+      pageSize: 20,
+      pageNum: 1,
+    },
   })
       .then(function (response) {
         console.log('/user/recommend',response);
         showToast('请求成功');
-        return response?.data;
+        return response?.data.records;
       })
       .catch(function (error) {
         console.log('/user/recommend',error);
