@@ -17,11 +17,24 @@
           :rules="[{ required: true, message: '请填写密码' }]"
       />
     </van-cell-group>
-    <div style="margin: 16px;">
+
+
+    <div style="margin: 20px;">
       <van-button round block type="primary" native-type="submit">
         提交
       </van-button>
     </div>
+    <div style="margin: 20px;">
+      <button round @click="forget" style="border: none; background-color: transparent; color: #1989fa; padding: 0; font-size:12px; float: left;">
+        忘记密码
+      </button>
+
+      <button round @click="toRegister" style="border: none; background-color: transparent; color: #1989fa; padding: 0; font-size:12px; float: right;">
+        注册账号
+      </button>
+    </div>
+
+
   </van-form>
 </template>
 
@@ -40,6 +53,13 @@ const userAccout = ref('');
 const userPassword = ref('');
 
 const user = ref();
+
+const toRegister = () => {
+  router.replace('/user/register')
+}
+const forget = () => {
+  window.location.href = 'https://github.com/jinsz1206/partner';
+}
 
 const onSubmit = async () => {
   const res = await myAxios.post('/user/login',{
