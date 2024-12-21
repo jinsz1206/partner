@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @Author jsz
  * @Package com.jsz.usercenter.exception
  */
+
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {

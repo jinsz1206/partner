@@ -1,6 +1,7 @@
 package com.jsz.partner_backend.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
@@ -13,14 +14,12 @@ import com.jsz.partner_backend.exception.BusinessException;
 import com.jsz.partner_backend.model.domain.User;
 import com.jsz.partner_backend.service.UserService;
 import com.jsz.partner_backend.mapper.UserMapper;
+import com.jsz.partner_backend.utils.AlgorithmUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.jsz.partner_backend.contant.UserConstant.USER_LOGIN_STATE;
@@ -266,6 +265,71 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public boolean isAdmin(User loginUser) {
         return loginUser != null && loginUser.getUserRole().equals("admin");
+    }
+
+    /**
+     * 推荐匹配用户
+     * @param num
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public List<User> matchUsers(long num, User loginUser) {
+//        这里我因为电脑内存问题，没有办法像鱼皮电脑那样可以存放100万数据，可以直接运行。所以我选择了运行5万条数据。
+//        不然的话会报 OOM（内存）的问题
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.last("limit 50000");
+//        List<User> userList = this.list(queryWrapper);
+//         或者用page分页查询，自己输入或默认数值，但这样匹配就有限制了
+//        List<User> userList = this.page(new Page<>(pageNum,pageSize),queryWrapper);
+//		这里查了所有用户，近100万条
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.isNotNull("tags");
+        queryWrapper.select("id", "tags");
+        List<User> userList = this.list(queryWrapper);
+
+        String tags = loginUser.getTags();
+        Gson gson = new Gson();
+        List<String> tagList = gson.fromJson(tags, new TypeToken<List<String>>() {
+        }.getType());
+        // 用户列表的下表 => 相似度'
+        List<Pair<User, Long>> list = new ArrayList<>();
+        // 依次计算当前用户和所有用户的相似度
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            String userTags = user.getTags();
+            //无标签的 或当前用户为自己
+            if (StrUtil.isBlank(userTags) || user.getId() == loginUser.getId()) {
+                continue;
+            }
+            List<String> userTagList = gson.fromJson(userTags, new TypeToken<List<String>>() {
+            }.getType());
+            //计算分数
+            long distance = AlgorithmUtils.minDistance(tagList, userTagList);
+            list.add(new Pair<>(user, distance));
+        }
+        //按编辑距离有小到大排序
+        List<Pair<User, Long>> topUserPairList = list.stream()
+                .sorted((a, b) -> (int) (a.getValue() - b.getValue()))
+                .limit(num)
+                .collect(Collectors.toList());
+        //有顺序的userID列表
+        List<Long> userListVo = topUserPairList.stream().map(pari -> pari.getKey().getId()).collect(Collectors.toList());
+
+        //根据id查询user完整信息
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.in("id", userListVo);
+        Map<Long, List<User>> userIdUserListMap = this.list(userQueryWrapper).stream()
+                .map(this::getSafeUser)
+                .collect(Collectors.groupingBy(User::getId));
+
+        // 因为上面查询打乱了顺序，这里根据上面有序的userID列表赋值
+        List<User> finalUserList = new ArrayList<>();
+        for (Long userId : userListVo) {
+            finalUserList.add(userIdUserListMap.get(userId).get(0));
+        }
+        return finalUserList;
+
     }
 
 

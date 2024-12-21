@@ -1,8 +1,11 @@
 package com.jsz.partner_backend.model.request;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 
+@Data
 public class TeamAddRequest implements Serializable {
 
 

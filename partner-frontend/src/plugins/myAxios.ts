@@ -1,6 +1,8 @@
 // Set config defaults when creating the instance
 //自定义实例默认值
 import axios from "axios";
+import {useRoute, useRouter} from "vue-router";
+import {showToast} from "vant";
 
 
 
@@ -28,12 +30,16 @@ myAxios.interceptors.request.use(function (config) {
     // 对请求错误做些什么
     return Promise.reject(error);
 });
+const router = useRouter()
 
 // 添加响应拦截器
 myAxios.interceptors.response.use(function (response) {
     // 对响应数据做点什么
-    console.log("请求收到了了",response)
-    return response.data;
+    //未登录跳转登录
+    if (response?.data?.code == 40100) {
+        showToast("请先登录")
+        window.location.href = '#/user/login'
+    } return response.data;
 }, function (error) {
     // 对响应错误做点什么
     return Promise.reject(error);

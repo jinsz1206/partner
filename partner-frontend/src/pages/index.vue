@@ -1,52 +1,86 @@
 <template>
-  <user-card-list :user-list="userList" />
-  <van-empty v-if="!userList || userList.length < 1" description="搜索接口为空"  />
+  <van-cell center title="寻找伙伴">
+    <template #right-icon>
+      <van-switch v-model="isMatchMode" size="24" />
+    </template>
+  </van-cell>
+  <user-card-list :user-list="userList" :loading="loading"/>
+  <van-empty v-if="!userList || userList.length < 1" description="数据为空" />
 </template>
 
-<script setup >
-import {onMounted, ref} from "vue";
+<script setup lang="ts">
+import {watchEffect, ref} from "vue";
 import {useRoute} from "vue-router";
-
 import myAxios from "../plugins/myAxios.ts";
 import UserCardList from "../components/UserCardList.vue";
+import {showToast} from "vant";
+import userType from "../model/user";
+
+
 
 
 const route = useRoute();
 const {tags} = route.query;
+const userList = ref([]);
+const isMatchMode = ref<boolean>(false);
+const loading = ref(true);
 
+/**
+ * 加载数据
+ */
+const loadData = async () => {
+  let userListData;
+  loading.value = true;
+  //心动模式
+  if (isMatchMode.value){
+    const  num = 5;
+    userListData = await myAxios.get('user/match',{
+      params: {
+        num,
+      },
+    })
+        .then(function (response) {
+          console.log('/user/match succeed',response);
+          showToast('请求成功');
+          return response?.data;
+        })
+        .catch(function (error) {
+          console.log('/user/match error',error);
+          showToast('请求失败');
+        });
+  }else {
+    //普通用户使用分页查询
+    userListData = await  myAxios.get('/user/recommend',{
+      params: {
+        pageSize: 8,
+        pageNum: 1,
+      },
+    })
+        .then(function (response) {
+          console.log('/user/recommend succeed', response);
+          showToast('请求成功');
+          return response?.data?.records;
+        })
+        .catch(function (error) {
+          console.log('/user/recommends error',error);
+          showToast('请求失败');
+        });
 
-
-const userList = ref();
-
-
-onMounted( async () =>{
-  // 为给定 ID 的 user 创建请求
-  const userListData = await myAxios.get('/user/recommend',{
-    params: {
-      pageSize: 20,
-      pageNum: 1,
-    },
-  })
-      .then(function (response) {
-        console.log('/user/recommend',response);
-        showToast('请求成功');
-        return response?.data.records;
-      })
-      .catch(function (error) {
-        console.log('/user/recommend',error);
-        showToast('请求失败');
-      });
+  }
   if (userListData){
-    userListData.forEach(user =>{
+    userListData.forEach((user: userType) =>{
       if (user.tags){
         user.tags = JSON.parse(user.tags);
       }
     })
     userList.value = userListData;
   }
+  loading.value = false;
+}
+
+watchEffect(() =>{
+  loadData();
 })
-
-
 
 </script>
 

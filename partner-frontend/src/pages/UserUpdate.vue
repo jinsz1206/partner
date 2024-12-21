@@ -42,9 +42,6 @@ const toEdit = (editKey:string, editName:string, currentValue:string) => {
     </van-cell>
     <van-cell title="性别" is-link to="/user/edit" :value="user.userGender" @click="toEdit('userGender','性别',user.userGender)" />
     <van-cell title="注册时间" :value="user.formattedCreateTime"  />
-    <van-cell title="修改信息" is-link to="/user/update" />
-    <van-cell title="我创建的队伍" is-link to="/team/created" />
-    <van-cell title="我加入的队伍" is-link to="/team/joined" />
   </template>
 </template>
 
